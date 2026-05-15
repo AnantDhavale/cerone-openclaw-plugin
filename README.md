@@ -81,6 +81,8 @@ Do not use this plugin with sensitive or regulated data unless your organization
 has approved that data flow. Avoid passing secrets or unnecessary sensitive
 payloads in tool parameters where possible.
 
+See [PRIVACY.md](./PRIVACY.md) for the free-trial data handling policy.
+
 ---
 
 ## OpenClaw Configuration
