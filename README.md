@@ -143,6 +143,47 @@ Plugin runtime config belongs under `plugins.entries.<plugin-id>.config`.
 
 ---
 
+## Example: Governed X/Twitter Actions
+
+Cerone is useful when an OpenClaw workspace has tools that can publish or change public state. For example, pair this plugin with [TweetClaw](https://github.com/Xquik-dev/tweetclaw) when an agent can search tweets, search tweet replies, post tweets, post tweet replies, export followers, look up users, upload or download media, send direct messages, monitor tweets, deliver webhooks, or run giveaway draws.
+
+Install TweetClaw separately:
+
+```bash
+openclaw plugins install @xquik/tweetclaw
+openclaw config set tools.alsoAllow '["explore", "tweetclaw"]'
+```
+
+Then describe the social-media capability in Cerone's agent registration fields:
+
+```json
+{
+  "plugins": {
+    "entries": {
+      "cerone-openclaw-plugin": {
+        "enabled": true,
+        "config": {
+          "flaggedBehavior": "requireApproval",
+          "networkFailureBehavior": "block",
+          "agentPurpose": "Use OpenClaw tools for repository work and approval-gated X/Twitter automation.",
+          "agentCapabilities": [
+            "file_read",
+            "file_write",
+            "api_call",
+            "tweet_search",
+            "tweet_write_requires_approval"
+          ]
+        }
+      }
+    }
+  }
+}
+```
+
+Keep the Xquik API key in TweetClaw's local OpenClaw config, not in chat messages or Cerone prompts. With `flaggedBehavior` set to `requireApproval`, Cerone can return an approval decision before OpenClaw executes high-risk `tweetclaw` calls.
+
+---
+
 ## Cerone Request Mapping
 
 The plugin sends:
