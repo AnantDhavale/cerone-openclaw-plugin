@@ -20,7 +20,7 @@ open-sourcing the plugin system that makes integrations like this possible.
 - `trial_warning: true`: log a warning.
 - `trial_stoploss: true`: block with `Trial limit reached`.
 
-## AZTP-aligned flow
+## AZTP-aligned flow (AZTP is the core intelligence layer for Cerone)
 
 This plugin is aligned to the current hosted AZTP/Cerone runtime shape:
 
