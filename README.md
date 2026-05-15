@@ -184,3 +184,7 @@ The current AZTP-aligned path for this plugin is hosted trial bootstrap, not a l
 ## License
 
 See [LICENSE](./LICENSE) for details.
+
+Any errors, please hit me up : anantdhavale@gmail.com
+
+I am working on patching the incorrect rejection as I write this comment. 
