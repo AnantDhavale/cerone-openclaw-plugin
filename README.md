@@ -64,6 +64,25 @@ This plugin is aligned to the current hosted Cerone runtime shape:
 
 ---
 
+## Data Handling
+
+This plugin sends tool invocation data to the Cerone API at runtime for validation.
+
+Depending on how your OpenClaw tools are defined, that runtime data may include:
+
+- tool names
+- tool parameters
+- file paths
+- URLs
+- prompts or query text
+- session or run metadata you choose to include
+
+Do not use this plugin with sensitive or regulated data unless your organization
+has approved that data flow. Avoid passing secrets or unnecessary sensitive
+payloads in tool parameters where possible.
+
+---
+
 ## OpenClaw Configuration
 
 Plugin runtime config belongs under `plugins.entries.<plugin-id>.config`.
