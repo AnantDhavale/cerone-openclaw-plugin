@@ -1,7 +1,7 @@
 
 # cerone-openclaw-plugin
 
-A native OpenClaw plugin that validates tool calls with **Cerone/AZTP** through OpenClaw's `before_tool_call` hook, before execution.
+A native OpenClaw plugin that validates tool calls with **Cerone** through OpenClaw's `before_tool_call` hook, before execution.
 
 No core patching. Uses the public plugin SDK and OpenClaw's built-in plugin approval flow.
 
@@ -52,9 +52,9 @@ After install, enable the plugin and configure it in `openclaw.json`.
 
 ---
 
-## AZTP-Aligned Flow
+## Cerone-Aligned Flow
 
-This plugin is aligned to the current hosted AZTP/Cerone runtime shape:
+This plugin is aligned to the current hosted Cerone runtime shape:
 
 1. If `apiKey` is configured, use it.
 2. If `apiKey` is omitted and `trialMode` is `auto`, request a hosted trial token.
@@ -104,7 +104,7 @@ Plugin runtime config belongs under `plugins.entries.<plugin-id>.config`.
 
 ## Config Fields
 
-- `apiKey`: optional provisioned Cerone/AZTP key.
+- `apiKey`: optional provisioned Cerone key.
 - `baseUrl`: Cerone base URL. Defaults to `https://aztp-homer-semantics.onrender.com`.
 - `timeoutMs`: HTTP timeout for Cerone validation calls.
 - `flaggedBehavior`: `requireApproval | allow | block`.
