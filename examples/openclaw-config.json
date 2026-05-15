@@ -1,0 +1,28 @@
+{
+  "plugins": {
+    "entries": {
+      "cerone-openclaw-plugin": {
+        "enabled": true,
+        "config": {
+          "baseUrl": "https://aztp-homer-semantics.onrender.com",
+          "timeoutMs": 1000,
+          "flaggedBehavior": "requireApproval",
+          "networkFailureBehavior": "allow",
+          "approvalTimeoutMs": 120000,
+          "includeContext": true,
+          "includeDerivedPaths": true,
+          "trialMode": "auto",
+          "autoRegisterAgent": true,
+          "persistAgentId": true,
+          "agentPurpose": "Read repository files and inspect code inside OpenClaw for software engineering tasks.",
+          "agentCapabilities": [
+            "file_read",
+            "file_write",
+            "network_access",
+            "api_call"
+          ]
+        }
+      }
+    }
+  }
+}

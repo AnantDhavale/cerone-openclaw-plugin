@@ -1,0 +1,87 @@
+{
+  "id": "cerone-openclaw-plugin",
+  "name": "Cerone OpenClaw Plugin",
+  "description": "Validate OpenClaw tool calls with Cerone/AZTP before execution.",
+  "activation": {
+    "onStartup": true
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "apiKey": {
+        "type": "string"
+      },
+      "baseUrl": {
+        "type": "string"
+      },
+      "timeoutMs": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 600000
+      },
+      "flaggedBehavior": {
+        "type": "string",
+        "enum": ["requireApproval", "allow", "block"]
+      },
+      "networkFailureBehavior": {
+        "type": "string",
+        "enum": ["allow", "block"]
+      },
+      "approvalTimeoutMs": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 600000
+      },
+      "includeContext": {
+        "type": "boolean"
+      },
+      "includeDerivedPaths": {
+        "type": "boolean"
+      },
+      "trialMode": {
+        "type": "string",
+        "enum": ["auto", "off"]
+      },
+      "autoRegisterAgent": {
+        "type": "boolean"
+      },
+      "persistAgentId": {
+        "type": "boolean"
+      },
+      "agentPurpose": {
+        "type": "string"
+      },
+      "agentCapabilities": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "agentEnvironment": {
+        "type": "string",
+        "enum": ["development", "staging", "production"]
+      },
+      "stateFilePath": {
+        "type": "string"
+      }
+    }
+  },
+  "uiHints": {
+    "apiKey": {
+      "label": "Cerone API key",
+      "placeholder": "sk_trial_... or provisioned key",
+      "sensitive": true
+    },
+    "baseUrl": {
+      "label": "Cerone base URL",
+      "placeholder": "https://aztp-homer-semantics.onrender.com"
+    },
+    "agentPurpose": {
+      "label": "Agent purpose"
+    },
+    "agentCapabilities": {
+      "label": "Agent capabilities"
+    }
+  }
+}

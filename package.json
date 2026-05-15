@@ -1,0 +1,84 @@
+{
+  "name": "cerone-openclaw-plugin",
+  "version": "0.1.0",
+  "description": "OpenClaw before_tool_call plugin for Cerone/AZTP validation",
+  "keywords": [
+    "openclaw",
+    "plugin",
+    "cerone",
+    "aztp",
+    "agent-governance",
+    "tool-approval"
+  ],
+  "homepage": "https://github.com/homersemantics/cerone-openclaw-plugin",
+  "bugs": {
+    "url": "https://github.com/homersemantics/cerone-openclaw-plugin/issues"
+  },
+  "license": "MIT",
+  "author": "Homer Semantics",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/homersemantics/cerone-openclaw-plugin.git"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "openclaw.plugin.json",
+    "examples",
+    "LICENSE"
+  ],
+  "openclaw": {
+    "extensions": [
+      "./src/index.ts"
+    ],
+    "runtimeExtensions": [
+      "./dist/index.js"
+    ],
+    "install": {
+      "npmSpec": "cerone-openclaw-plugin",
+      "defaultChoice": "npm",
+      "minHostVersion": ">=2026.5.14-beta.1"
+    },
+    "compat": {
+      "pluginApi": ">=2026.5.14-beta.1"
+    },
+    "build": {
+      "openclawVersion": "2026.5.14-beta.1"
+    },
+    "release": {
+      "publishToClawHub": true,
+      "publishToNpm": true
+    }
+  },
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build": "rm -rf dist && tsc -p tsconfig.json --outDir dist",
+    "test": "vitest run",
+    "prepack": "npm run build",
+    "prepublishOnly": "npm test && npm run build"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "peerDependencies": {
+    "openclaw": ">=2026.5.14-beta.1"
+  },
+  "peerDependenciesMeta": {
+    "openclaw": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^24.9.1",
+    "openclaw": "^2026.5.14-beta.1",
+    "typescript": "^5.6.3",
+    "vitest": "^4.1.6"
+  }
+}
