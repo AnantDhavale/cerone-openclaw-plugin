@@ -1,6 +1,5 @@
 import os from "node:os";
 import path from "node:path";
-
 import type { CeronePluginConfig } from "./types.js";
 
 const DEFAULT_STATE_PATH = path.join(
@@ -41,12 +40,11 @@ function asStringArray(value: unknown, fallback: string[]): string[] {
 
 export function resolvePluginConfig(raw: unknown): CeronePluginConfig {
   const cfg = isRecord(raw) ? raw : {};
-
   return {
     apiKey: asString(cfg.apiKey),
     baseUrl:
       asString(cfg.baseUrl)?.replace(/\/+$/u, "") ??
-      "https://aztp-homer-semantics.onrender.com",
+      "https://api.homersemantics.com",
     timeoutMs: asNumber(cfg.timeoutMs, 1000),
     flaggedBehavior:
       cfg.flaggedBehavior === "allow" || cfg.flaggedBehavior === "block"
@@ -59,8 +57,10 @@ export function resolvePluginConfig(raw: unknown): CeronePluginConfig {
     trialMode: cfg.trialMode === "off" ? "off" : "auto",
     autoRegisterAgent: asBoolean(cfg.autoRegisterAgent, true),
     persistAgentId: asBoolean(cfg.persistAgentId, true),
-    agentPurpose: asString(cfg.agentPurpose),
-    agentCapabilities: asStringArray(cfg.agentCapabilities, []),
+    agentPurpose:
+      asString(cfg.agentPurpose) ??
+      "Read and inspect repository files to support software engineering and code analysis tasks",
+    agentCapabilities: asStringArray(cfg.agentCapabilities, ["file_read"]),
     agentEnvironment:
       cfg.agentEnvironment === "staging" || cfg.agentEnvironment === "production"
         ? cfg.agentEnvironment
