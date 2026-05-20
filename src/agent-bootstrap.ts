@@ -14,8 +14,8 @@ function requireAgentRegistrationConfig(
 ): asserts config is RegistrationReadyConfig {
   if (!config.agentPurpose) {
     throw new CeroneConfigError(
-      "agentPurpose is required when autoRegisterAgent is enabled and no persisted agent_id exists",
-    );
+      "agentPurpose is required. Use a descriptive purpose that matches your agent's actual tool usage. " +
+      "Example: 'Read and inspect repository files to support software engineering tasks'"    );
   }
 
   if (config.agentCapabilities.length === 0) {
