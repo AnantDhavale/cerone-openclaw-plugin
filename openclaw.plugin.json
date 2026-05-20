@@ -75,7 +75,7 @@
     },
     "baseUrl": {
       "label": "Cerone base URL",
-      "placeholder": "https://aztp-homer-semantics.onrender.com"
+      "placeholder": "https://api.homersemantics.com"
     },
     "agentPurpose": {
       "label": "Agent purpose"

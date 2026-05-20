@@ -37,6 +37,7 @@ export type BootstrapState = {
   apiKey: string;
   agentId: string;
   source: "configured" | "trial";
+  profileKey: string;
 };
 
 export type CeroneActionContext = {
@@ -89,6 +90,12 @@ export type HookToolEvent = {
   runId?: string;
   toolCallId?: string;
   derivedPaths?: readonly string[];
+};
+
+export type ResolvedAgentProfile = {
+  purpose: string;
+  capabilities: [string, ...string[]];
+  inferred: boolean;
 };
 
 export type HookToolContext = {

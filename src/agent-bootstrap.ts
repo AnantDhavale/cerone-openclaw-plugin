@@ -1,31 +1,33 @@
+import { resolveAgentProfile } from "./agent-profile.js";
 import { createAgent } from "./aztp-client.js";
 import { resolveAuthSession } from "./auth.js";
 import { buildProfileKey, loadState, saveState } from "./state-store.js";
-import type { BootstrapState, CeronePluginConfig, PersistentState } from "./types.js";
+import type {
+  BootstrapState,
+  CeronePluginConfig,
+  HookToolEvent,
+  PersistentState,
+  ResolvedAgentProfile,
+} from "./types.js";
 import { CeroneConfigError } from "./types.js";
 
-type RegistrationReadyConfig = CeronePluginConfig & {
-  agentPurpose: string;
-  agentCapabilities: [string, ...string[]];
-};
-
-function requireAgentRegistrationConfig(
-  config: CeronePluginConfig,
-): asserts config is RegistrationReadyConfig {
-  if (!config.agentPurpose) {
+function validateExplicitProfile(profile: ResolvedAgentProfile): void {
+  if (!profile.purpose.trim()) {
     throw new CeroneConfigError(
-      "agentPurpose is required. Use a descriptive purpose that matches your agent's actual tool usage. " +
-      "Example: 'Read and inspect repository files to support software engineering tasks'"    );
+      "agentPurpose must be a non-empty descriptive purpose when provided.",
+    );
   }
-
-  if (config.agentCapabilities.length === 0) {
+  if (profile.capabilities.length === 0) {
     throw new CeroneConfigError(
-      "agentCapabilities must include at least one real Cerone capability when autoRegisterAgent is enabled and no persisted agent_id exists",
+      "agentCapabilities must include at least one Cerone capability when provided.",
     );
   }
 }
 
-export async function ensureBootstrapState(config: CeronePluginConfig): Promise<BootstrapState | null> {
+export async function ensureBootstrapState(
+  config: CeronePluginConfig,
+  event: HookToolEvent,
+): Promise<BootstrapState | null> {
   const persisted = config.persistAgentId ? await loadState(config.stateFilePath) : null;
   const authSession = await resolveAuthSession({
     config,
@@ -36,7 +38,17 @@ export async function ensureBootstrapState(config: CeronePluginConfig): Promise<
     return null;
   }
 
-  const profileKey = buildProfileKey(config, authSession.source);
+  const profile = resolveAgentProfile(config, event);
+  if (!profile.inferred) {
+    validateExplicitProfile(profile);
+  }
+
+  const profileKey = buildProfileKey({
+    baseUrl: config.baseUrl,
+    authMode: authSession.source,
+    profile,
+    agentEnvironment: config.agentEnvironment,
+  });
   const reusableState: PersistentState | null =
     persisted && persisted.profileKey === profileKey ? persisted : null;
 
@@ -45,12 +57,11 @@ export async function ensureBootstrapState(config: CeronePluginConfig): Promise<
     if (!config.autoRegisterAgent) {
       return null;
     }
-    requireAgentRegistrationConfig(config);
     agentId = await createAgent({
       config,
       apiKey: authSession.apiKey,
-      purpose: config.agentPurpose,
-      capabilities: config.agentCapabilities,
+      purpose: profile.purpose,
+      capabilities: profile.capabilities,
       environment: config.agentEnvironment,
     });
   }
@@ -68,5 +79,6 @@ export async function ensureBootstrapState(config: CeronePluginConfig): Promise<
     apiKey: authSession.apiKey,
     agentId,
     source: authSession.source,
+    profileKey,
   };
 }

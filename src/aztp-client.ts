@@ -8,6 +8,8 @@ import type {
 } from "./types.js";
 import { CeroneHttpError } from "./types.js";
 
+const USER_AGENT = "cerone-openclaw-plugin/0.1.1";
+
 type RequestOptions = {
   apiKey: string;
   path: string;
@@ -24,7 +26,7 @@ async function requestJson<T>(baseUrl: string, options: RequestOptions): Promise
       headers: {
         "X-API-Key": options.apiKey,
         "Content-Type": "application/json",
-        "User-Agent": "cerone-openclaw-plugin/0.1.0",
+        "User-Agent": USER_AGENT,
       },
       body: options.body === undefined ? undefined : JSON.stringify(options.body),
       signal: controller.signal,

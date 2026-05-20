@@ -2,17 +2,22 @@ import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 
-import type { CeronePluginConfig, PersistentState } from "./types.js";
+import type { AgentEnvironment, PersistentState, ResolvedAgentProfile } from "./types.js";
 
-export function buildProfileKey(config: CeronePluginConfig, authMode: "configured" | "trial"): string {
+export function buildProfileKey(params: {
+  baseUrl: string;
+  authMode: "configured" | "trial";
+  profile: ResolvedAgentProfile;
+  agentEnvironment: AgentEnvironment;
+}): string {
   const hash = createHash("sha256");
   hash.update(
     JSON.stringify({
-      baseUrl: config.baseUrl,
-      authMode,
-      agentPurpose: config.agentPurpose,
-      agentCapabilities: [...config.agentCapabilities].sort(),
-      agentEnvironment: config.agentEnvironment,
+      baseUrl: params.baseUrl,
+      authMode: params.authMode,
+      agentPurpose: params.profile.purpose,
+      agentCapabilities: [...params.profile.capabilities].sort(),
+      agentEnvironment: params.agentEnvironment,
     }),
   );
   return hash.digest("hex");

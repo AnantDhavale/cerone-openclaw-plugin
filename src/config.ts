@@ -43,8 +43,7 @@ export function resolvePluginConfig(raw: unknown): CeronePluginConfig {
   return {
     apiKey: asString(cfg.apiKey),
     baseUrl:
-      asString(cfg.baseUrl)?.replace(/\/+$/u, "") ??
-      "https://api.homersemantics.com",
+      asString(cfg.baseUrl)?.replace(/\/+$/u, "") ?? "https://api.homersemantics.com",
     timeoutMs: asNumber(cfg.timeoutMs, 1000),
     flaggedBehavior:
       cfg.flaggedBehavior === "allow" || cfg.flaggedBehavior === "block"
@@ -57,10 +56,8 @@ export function resolvePluginConfig(raw: unknown): CeronePluginConfig {
     trialMode: cfg.trialMode === "off" ? "off" : "auto",
     autoRegisterAgent: asBoolean(cfg.autoRegisterAgent, true),
     persistAgentId: asBoolean(cfg.persistAgentId, true),
-    agentPurpose:
-      asString(cfg.agentPurpose) ??
-      "Read and inspect repository files to support software engineering and code analysis tasks",
-    agentCapabilities: asStringArray(cfg.agentCapabilities, ["file_read"]),
+    agentPurpose: asString(cfg.agentPurpose),
+    agentCapabilities: asStringArray(cfg.agentCapabilities, []),
     agentEnvironment:
       cfg.agentEnvironment === "staging" || cfg.agentEnvironment === "production"
         ? cfg.agentEnvironment

@@ -1,16 +1,17 @@
+import { resolveAgentProfile } from "./agent-profile.js";
 import { createAgent } from "./aztp-client.js";
 import { resolveAuthSession } from "./auth.js";
 import { buildProfileKey, loadState, saveState } from "./state-store.js";
 import { CeroneConfigError } from "./types.js";
-function requireAgentRegistrationConfig(config) {
-    if (!config.agentPurpose) {
-        throw new CeroneConfigError("agentPurpose is required when autoRegisterAgent is enabled and no persisted agent_id exists");
+function validateExplicitProfile(profile) {
+    if (!profile.purpose.trim()) {
+        throw new CeroneConfigError("agentPurpose must be a non-empty descriptive purpose when provided.");
     }
-    if (config.agentCapabilities.length === 0) {
-        throw new CeroneConfigError("agentCapabilities must include at least one real Cerone capability when autoRegisterAgent is enabled and no persisted agent_id exists");
+    if (profile.capabilities.length === 0) {
+        throw new CeroneConfigError("agentCapabilities must include at least one Cerone capability when provided.");
     }
 }
-export async function ensureBootstrapState(config) {
+export async function ensureBootstrapState(config, event) {
     const persisted = config.persistAgentId ? await loadState(config.stateFilePath) : null;
     const authSession = await resolveAuthSession({
         config,
@@ -19,19 +20,27 @@ export async function ensureBootstrapState(config) {
     if (!authSession) {
         return null;
     }
-    const profileKey = buildProfileKey(config, authSession.source);
+    const profile = resolveAgentProfile(config, event);
+    if (!profile.inferred) {
+        validateExplicitProfile(profile);
+    }
+    const profileKey = buildProfileKey({
+        baseUrl: config.baseUrl,
+        authMode: authSession.source,
+        profile,
+        agentEnvironment: config.agentEnvironment,
+    });
     const reusableState = persisted && persisted.profileKey === profileKey ? persisted : null;
     let agentId = reusableState?.agentId;
     if (!agentId) {
         if (!config.autoRegisterAgent) {
             return null;
         }
-        requireAgentRegistrationConfig(config);
         agentId = await createAgent({
             config,
             apiKey: authSession.apiKey,
-            purpose: config.agentPurpose,
-            capabilities: config.agentCapabilities,
+            purpose: profile.purpose,
+            capabilities: profile.capabilities,
             environment: config.agentEnvironment,
         });
     }
@@ -47,5 +56,6 @@ export async function ensureBootstrapState(config) {
         apiKey: authSession.apiKey,
         agentId,
         source: authSession.source,
+        profileKey,
     };
 }

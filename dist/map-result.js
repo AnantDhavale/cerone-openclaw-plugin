@@ -1,7 +1,10 @@
+function dedupeSemanticDrift(text) {
+    return text.replace(/^(Semantic drift detected:\s*)(Semantic drift detected:\s*)+/u, "$1");
+}
 function deriveReason(response, event) {
     const firstViolation = response.violations?.find((entry) => typeof entry === "string" && entry.trim());
     if (firstViolation) {
-        return firstViolation;
+        return dedupeSemanticDrift(firstViolation);
     }
     return `Cerone flagged ${event.toolName}`;
 }

@@ -29,8 +29,7 @@ export function resolvePluginConfig(raw) {
     const cfg = isRecord(raw) ? raw : {};
     return {
         apiKey: asString(cfg.apiKey),
-        baseUrl: asString(cfg.baseUrl)?.replace(/\/+$/u, "") ??
-            "https://aztp-homer-semantics.onrender.com",
+        baseUrl: asString(cfg.baseUrl)?.replace(/\/+$/u, "") ?? "https://api.homersemantics.com",
         timeoutMs: asNumber(cfg.timeoutMs, 1000),
         flaggedBehavior: cfg.flaggedBehavior === "allow" || cfg.flaggedBehavior === "block"
             ? cfg.flaggedBehavior

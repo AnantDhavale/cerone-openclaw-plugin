@@ -4,7 +4,7 @@
       "cerone-openclaw-plugin": {
         "enabled": true,
         "config": {
-          "baseUrl": "https://aztp-homer-semantics.onrender.com",
+          "baseUrl": "https://api.homersemantics.com",
           "timeoutMs": 1000,
           "flaggedBehavior": "requireApproval",
           "networkFailureBehavior": "allow",

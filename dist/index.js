@@ -1,4 +1,5 @@
 import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
+import { resolveAgentProfile } from "./agent-profile.js";
 import { ensureBootstrapState } from "./agent-bootstrap.js";
 import { buildValidationRequest, validateToolCall } from "./aztp-client.js";
 import { resolvePluginConfig } from "./config.js";
@@ -60,8 +61,13 @@ export default definePluginEntry({
             agentEnvironment: config.agentEnvironment,
             stateFilePath: config.stateFilePath,
         });
-        const getBootstrapState = async (config) => {
-            const configKey = configKeyFor(config);
+        const getBootstrapState = async (config, event) => {
+            const resolvedProfile = resolveAgentProfile(config, event);
+            const configKey = configKeyFor({
+                ...config,
+                agentPurpose: resolvedProfile.purpose,
+                agentCapabilities: [...resolvedProfile.capabilities],
+            });
             if (bootstrappedConfigKey && bootstrappedConfigKey !== configKey) {
                 bootstrappedState = undefined;
             }
@@ -69,7 +75,7 @@ export default definePluginEntry({
                 return bootstrappedState;
             }
             if (!bootstrapPromise) {
-                bootstrapPromise = ensureBootstrapState(config)
+                bootstrapPromise = ensureBootstrapState(config, event)
                     .then((resolved) => {
                     bootstrappedState = resolved;
                     bootstrappedConfigKey = configKey;
@@ -85,7 +91,7 @@ export default definePluginEntry({
             const config = resolvePluginConfig(api.pluginConfig);
             let session;
             try {
-                session = await getBootstrapState(config);
+                session = await getBootstrapState(config, event);
             }
             catch (error) {
                 if (error instanceof CeroneConfigError) {

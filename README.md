@@ -62,6 +62,11 @@ This plugin is aligned to the current hosted Cerone runtime shape:
 4. Persist the resulting `agent_id` and trial token by default.
 5. Call `POST /v1/validate` on every `before_tool_call`.
 
+If you do not set `agentPurpose` and `agentCapabilities`, the plugin now derives
+a coding-oriented Cerone profile from the first OpenClaw tool call so new users
+can get from trial bootstrap to first validation more reliably. For non-coding
+workflows or stricter production policy, set those fields explicitly.
+
 ---
 
 ## Data Handling
@@ -97,7 +102,7 @@ Plugin runtime config belongs under `plugins.entries.<plugin-id>.config`.
       "cerone-openclaw-plugin": {
         "enabled": true,
         "config": {
-          "baseUrl": "https://aztp-homer-semantics.onrender.com",
+          "baseUrl": "https://api.homersemantics.com",
           "timeoutMs": 1000,
           "flaggedBehavior": "requireApproval",
           "networkFailureBehavior": "allow",
@@ -126,7 +131,7 @@ Plugin runtime config belongs under `plugins.entries.<plugin-id>.config`.
 ## Config Fields
 
 - `apiKey`: optional provisioned Cerone key.
-- `baseUrl`: Cerone base URL. Defaults to `https://aztp-homer-semantics.onrender.com`.
+- `baseUrl`: Cerone base URL. Defaults to `https://api.homersemantics.com`.
 - `timeoutMs`: HTTP timeout for Cerone validation calls.
 - `flaggedBehavior`: `requireApproval | allow | block`.
 - `networkFailureBehavior`: `allow | block`.
@@ -136,8 +141,8 @@ Plugin runtime config belongs under `plugins.entries.<plugin-id>.config`.
 - `trialMode`: `auto | off`.
 - `autoRegisterAgent`: create a Cerone agent automatically when needed.
 - `persistAgentId`: persist trial token and Cerone `agent_id`.
-- `agentPurpose`: required when the plugin needs to auto-register a Cerone agent.
-- `agentCapabilities`: required when the plugin needs to auto-register a Cerone agent.
+- `agentPurpose`: optional. If omitted, the plugin derives a first-run coding-oriented purpose from the tool being called.
+- `agentCapabilities`: optional. If omitted, the plugin derives a minimal first-run capability set from the tool being called and Cerone's current capability mapping.
 - `agentEnvironment`: `development | staging | production`.
 - `stateFilePath`: optional override for persisted plugin state.
 
@@ -198,14 +203,10 @@ The current AZTP-aligned path for this plugin is hosted trial bootstrap, not a l
 - It does not require OpenClaw core changes.
 - It intentionally uses only `before_tool_call`.
 - It does not implement post-tool-call reporting or audit UI.
-- The runtime does not invent fallback capabilities or a fallback agent purpose. If `autoRegisterAgent` is enabled and no persisted `agent_id` exists, provide a real `agentPurpose` and `agentCapabilities`.
+- The plugin now derives a first-run coding profile when no Cerone purpose/capability fields are configured, using a minimal capability set based on the first tool being validated. Explicit `agentPurpose` and `agentCapabilities` are still recommended for non-coding or high-risk workflows.
 
 ---
 
 ## License
 
 See [LICENSE](./LICENSE) for details.
-
-Any errors, please hit me up : anantdhavale@gmail.com
-
-I am working on patching the incorrect rejection as I write this comment. Also working on broadening the semantic alignment. 

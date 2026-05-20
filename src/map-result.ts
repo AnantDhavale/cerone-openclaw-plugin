@@ -7,10 +7,17 @@ import type {
 
 type ApprovalResolutionHandler = NonNullable<NonNullable<HookDecision["requireApproval"]>["onResolution"]>;
 
+function dedupeSemanticDrift(text: string): string {
+  return text.replace(
+    /^(Semantic drift detected:\s*)(Semantic drift detected:\s*)+/u,
+    "$1",
+  );
+}
+
 function deriveReason(response: CeroneValidationResponse, event: HookToolEvent): string {
   const firstViolation = response.violations?.find((entry) => typeof entry === "string" && entry.trim());
   if (firstViolation) {
-    return firstViolation;
+    return dedupeSemanticDrift(firstViolation);
   }
   return `Cerone flagged ${event.toolName}`;
 }

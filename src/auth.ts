@@ -1,6 +1,8 @@
 import type { AuthSession, CeronePluginConfig, CreateTrialSessionResponse } from "./types.js";
 import { CeroneHttpError } from "./types.js";
 
+const USER_AGENT = "cerone-openclaw-plugin/0.1.1";
+
 async function readJson<T>(response: Response): Promise<T> {
   return (await response.json()) as T;
 }
@@ -13,6 +15,7 @@ export async function createTrialSession(config: CeronePluginConfig): Promise<st
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "User-Agent": USER_AGENT,
       },
       body: "{}",
       signal: controller.signal,

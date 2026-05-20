@@ -1,15 +1,15 @@
 import { describe, expect, it } from "vitest";
 
+import { resolveAgentProfile } from "./agent-profile.js";
 import { ensureBootstrapState } from "./agent-bootstrap.js";
 import { buildValidationRequest } from "./aztp-client.js";
 import { resolvePluginConfig } from "./config.js";
 import { mapValidationResult } from "./map-result.js";
-import { CeroneConfigError } from "./types.js";
 
 describe("cerone-openclaw-plugin config", () => {
   it("uses AZTP-aligned defaults", () => {
     const config = resolvePluginConfig({});
-    expect(config.baseUrl).toBe("https://aztp-homer-semantics.onrender.com");
+    expect(config.baseUrl).toBe("https://api.homersemantics.com");
     expect(config.flaggedBehavior).toBe("requireApproval");
     expect(config.networkFailureBehavior).toBe("allow");
     expect(config.timeoutMs).toBe(1000);
@@ -21,16 +21,79 @@ describe("cerone-openclaw-plugin config", () => {
   });
 });
 
+describe("cerone-openclaw-plugin inferred profile", () => {
+  it("derives a coding-oriented profile from a file tool", () => {
+    const profile = resolveAgentProfile(resolvePluginConfig({}), {
+      toolName: "file_read",
+      params: { path: "README.md" },
+      derivedPaths: ["README.md"],
+    });
+
+    expect(profile.inferred).toBe(true);
+    expect(profile.purpose).toContain("Perform file_read operations");
+    expect(profile.purpose).toContain("read files from a codebase");
+    expect(profile.purpose).toContain("README.md");
+    expect(profile.capabilities).toEqual(["file_read"]);
+  });
+
+  it("adds unknown tool names as explicit capabilities", () => {
+    const profile = resolveAgentProfile(resolvePluginConfig({}), {
+      toolName: "tweetclaw",
+      params: {},
+    });
+
+    expect(profile.capabilities[0]).toBe("tweetclaw");
+    expect(profile.purpose).toContain("Perform tweetclaw operations");
+  });
+
+  it("uses the explicit profile when provided", () => {
+    const profile = resolveAgentProfile(
+      resolvePluginConfig({
+        agentPurpose: "Inspect repositories safely",
+        agentCapabilities: ["file_read"],
+      }),
+      {
+        toolName: "file_read",
+        params: {},
+      },
+    );
+
+    expect(profile.inferred).toBe(false);
+    expect(profile.purpose).toBe("Inspect repositories safely");
+    expect(profile.capabilities).toEqual(["file_read"]);
+  });
+
+  it("keeps an explicit purpose while deriving capabilities when only purpose is provided", () => {
+    const profile = resolveAgentProfile(
+      resolvePluginConfig({
+        agentPurpose: "Inspect repositories safely",
+      }),
+      {
+        toolName: "file_write",
+        params: {},
+      },
+    );
+
+    expect(profile.inferred).toBe(true);
+    expect(profile.purpose).toBe("Inspect repositories safely");
+    expect(profile.capabilities).toEqual(["file_write"]);
+  });
+});
+
 describe("cerone-openclaw-plugin bootstrap requirements", () => {
-  it("requires explicit agent registration config when no persisted agent exists", async () => {
+  it("returns null when no auth session is available and trial mode is off", async () => {
     const config = resolvePluginConfig({
-      apiKey: "sk_live_configured",
       trialMode: "off",
       autoRegisterAgent: true,
       persistAgentId: false,
     });
 
-    await expect(ensureBootstrapState(config)).rejects.toBeInstanceOf(CeroneConfigError);
+    await expect(
+      ensureBootstrapState(config, {
+        toolName: "file_read",
+        params: { path: "README.md" },
+      }),
+    ).resolves.toBeNull();
   });
 });
 
@@ -139,6 +202,25 @@ describe("cerone-openclaw-plugin result mapping", () => {
       requireApproval: {
         description: "Cerone flagged file_write",
       },
+    });
+  });
+
+  it("deduplicates repeated semantic drift prefixes", () => {
+    expect(
+      mapValidationResult({
+        config: baseConfig,
+        event,
+        response: {
+          result: "rejected",
+          violations: [
+            "Semantic drift detected: Semantic drift detected: alignment score 0.35 below threshold",
+          ],
+        },
+        pluginId: "cerone-openclaw-plugin",
+      }),
+    ).toEqual({
+      block: true,
+      blockReason: "Semantic drift detected: alignment score 0.35 below threshold",
     });
   });
 });

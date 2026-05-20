@@ -1,14 +1,14 @@
 import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
-export function buildProfileKey(config, authMode) {
+export function buildProfileKey(params) {
     const hash = createHash("sha256");
     hash.update(JSON.stringify({
-        baseUrl: config.baseUrl,
-        authMode,
-        agentPurpose: config.agentPurpose,
-        agentCapabilities: [...config.agentCapabilities].sort(),
-        agentEnvironment: config.agentEnvironment,
+        baseUrl: params.baseUrl,
+        authMode: params.authMode,
+        agentPurpose: params.profile.purpose,
+        agentCapabilities: [...params.profile.capabilities].sort(),
+        agentEnvironment: params.agentEnvironment,
     }));
     return hash.digest("hex");
 }
